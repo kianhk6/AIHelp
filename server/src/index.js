@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { captureAndAnalyze } from './emotionDetection.js';
 import {Open} from './Open.js';
 
+
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 const open = new Open();
@@ -25,8 +26,8 @@ app.get('/', async (req, res) => {
 })
 
 // will recieve an image from the client
-app.post('/emotion', async (req, res) => {
-	const { image } = req.body; // base64 image
+app.post('/advice', async (req, res) => {
+	const { image, audio } = req.body; // base64 image
 	const emotion = await captureAndAnalyze(image);
 	res.json({ emotion });
 })

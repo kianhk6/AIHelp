@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/StormHacks-2024/SGKZ#readme",
   "dependencies": {
+    "@tensorflow/tfjs-node": "^4.19.0",
     "canvas": "^2.11.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
