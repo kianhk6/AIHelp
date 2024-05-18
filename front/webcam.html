@@ -8,14 +8,45 @@
 </head>
 <body>
   <video id="video" width="640" height="480" autoplay></video>
+
+  <!-- place 2 buttons, one to record audio from mic -->
+  <!-- and another to stop recording -->
+
+  <div id="audio">
+    <button id="record">Record</button>
+    <button id="stop">Stop</button>
+  </div>
+
   <script>
+    const recordButton = document.getElementById('record');
+    const stopButton = document.getElementById('stop');
+    const audio = document.getElementById('audio');
+
+    const audioChunks = [];
+
+    recordButton.addEventListener('click', async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      audioChunks.length = 0;
+
+      mediaRecorder.addEventListener('dataavailable', event => {
+        audioChunks.push(event.data);
+      });
+
+      mediaRecorder.start();
+      stopButton.addEventListener('click', () => {
+        mediaRecorder.stop();
+      });
+    });
+
     async function setupWebcam() {
       const video = document.getElementById('video');
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       video.srcObject = stream;
     }
 
-    setInterval(async () => {
+    // get an image from the webcam function
+    function capture() {
       const video = document.getElementById('video');
       const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
@@ -23,15 +54,27 @@
       const context = canvas.getContext('2d');
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const data = canvas.toDataURL('image/jpeg');
-      const response = await fetch('http://localhost:5000/emotion', {
+      return data;
+    }
+
+    // when the stop button is clicked, capture the image and send audio and image to the server
+    stopButton.addEventListener('click', async () => {
+      // make Audio into a mp3
+      const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+      const image = capture();
+      const data = { audio: audioBlob, image };
+      const options = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ image: data })
-      });
-      console.log(await response.json());
-    }, 5000);
+        body: JSON.stringify(data)
+      };
+
+      const response = await fetch('http://localhost:5000/advice', options);
+      const json = await response.json();
+      console.log(json);
+    });
 
     setupWebcam();
   </script>
