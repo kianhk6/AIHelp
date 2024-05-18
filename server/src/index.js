@@ -1,13 +1,16 @@
 
 import express from 'express';
 import dotenv from 'dotenv';
+import {Open} from './Open.js'
+
 dotenv.config();
 const PORT = process.env.PORT || 5000;
+const open = new Open();
 
 const app = express();
 
-app.get('/', (req, res) => {
-	  res.send('Hello World');
+app.get('/', async (req, res) => {
+	res.json(await open.chat());
 })
 
 app.listen(PORT, () => {
