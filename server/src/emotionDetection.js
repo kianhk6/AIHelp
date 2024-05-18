@@ -1,4 +1,3 @@
-import NodeWebcam from 'node-webcam';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,39 +7,30 @@ import canvas from 'canvas';
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
-// Webcam options
-const webcamOptions = {
-  width: 1280,
-  height: 720,
-  quality: 100,
-  delay: 0,
-  saveShots: true,
-  output: 'jpeg',
-  device: false,
-  callbackReturn: 'location',
-  verbose: false,
-};
-
-const Webcam = NodeWebcam.create(webcamOptions);
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-function captureAndAnalyze() {
-  const imagePath = path.join(__dirname, 'snapshot.jpg');
-  Webcam.capture(imagePath, (err, data) => {
-    if (err) return console.error('Failed to capture image:', err);
-    analyzeEmotion(imagePath);
+console.log("dirname", __dirname);
+
+function captureAndAnalyze(imageBase64Data) {
+  const emotion = analyzeEmotion(imageBase64Data).then((emotion) => {
+    console.log(emotion);
+    return emotion;
   });
+
+  return emotion;
 }
 
 // Function to analyze emotions
-async function analyzeEmotion(imagePath) {
+async function analyzeEmotion(imageBase64Data) {
   try {
-    const image = fs.readFileSync(imagePath);
-    const emotions = await detectEmotion(image);
+    const imageElement = await canvas.loadImage(imageBase64Data);
+    const emotions = await detectEmotion(imageElement);
+    
     let dominantEmotion = 'neutral';
     let highestProbability = 0;
+
+    console.log(emotions);
 
     emotions.forEach(emotion => {
       for (const [key, value] of Object.entries(emotion.expressions)) {
