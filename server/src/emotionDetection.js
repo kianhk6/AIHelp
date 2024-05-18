@@ -1,7 +1,12 @@
-const express = require('express');
-const NodeWebcam = require('node-webcam');
-const fs = require('fs');
-const path = require('path');
+import NodeWebcam from 'node-webcam';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import faceapi from 'face-api.js';
+import canvas from 'canvas';
+
+const { Canvas, Image, ImageData } = canvas;
+faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
 // Webcam options
 const webcamOptions = {
@@ -18,13 +23,16 @@ const webcamOptions = {
 
 const Webcam = NodeWebcam.create(webcamOptions);
 
-// Mock detectEmotion function (replace with actual implementation)
-const detectEmotion = async (image) => {
-  // Replace with actual emotion detection logic
-  return [
-    { expressions: { happy: 0.8, sad: 0.1, neutral: 0.1 } }
-  ];
-};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function captureAndAnalyze() {
+  const imagePath = path.join(__dirname, 'snapshot.jpg');
+  Webcam.capture(imagePath, (err, data) => {
+    if (err) return console.error('Failed to capture image:', err);
+    analyzeEmotion(imagePath);
+  });
+}
 
 // Function to analyze emotions
 async function analyzeEmotion(imagePath) {
@@ -43,10 +51,21 @@ async function analyzeEmotion(imagePath) {
       }
     });
 
-    const prompt = `The user appears to be feeling ${dominantEmotion}. Provide some emotional support.`;
-    const response = await getResponse(prompt);
-    speak(response);
+    console.log(emotions);
+
+    return dominantEmotion;
   } catch (error) {
     console.error('Failed to detect emotion or get response:', error);
   }
 }
+
+await faceapi.nets.tinyFaceDetector.loadFromDisk('./models');
+await faceapi.nets.faceExpressionNet.loadFromDisk('./models');
+
+const detectEmotion = async (image) => {
+  const detections = await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
+  return detections;
+};
+
+
+export { captureAndAnalyze };
