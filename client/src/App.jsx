@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 function App() {
+    const URI = "http://localhost:5000";
     const videoRef = useRef(null);
     const mediaRecorderRef = useRef(null); // Ref for MediaRecorder
     const audioChunksRef = useRef([]);
@@ -43,7 +44,7 @@ function App() {
 
         try {
             const response = await fetch(
-                "http://localhost:5000/history",
+                `${URI}/history`,
                 options
             );
             const json = await response.json();
@@ -130,7 +131,7 @@ function App() {
 
                 try {
                     const response = await fetch(
-                        "http://localhost:5000/chat",
+                        `${URI}/chat`,
                         options
                     );
                     const json = await response.json();
@@ -186,7 +187,7 @@ function App() {
 
     const handlePlayEverything = async () => {
         try {
-            const response = await fetch('http://localhost:5000/queryVoicesAndAI', {
+            const response = await fetch(`${URI}/queryVoicesAndAI`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -237,7 +238,7 @@ function App() {
 
         try {
             // Send a POST request to the server with the UUID of the chat session
-            const response = await fetch('http://localhost:5000/summarizeChat', {
+            const response = await fetch(`${URI}/summarizeChat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
