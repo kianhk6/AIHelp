@@ -2,7 +2,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { captureAndAnalyze } from './emotionDetection.js';
-import {Open} from './Open.js';
+import { Open } from './Open.js';
 
 
 dotenv.config();
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', async (req, res) => {
-	res.json(await open.chat());
+	res.json(await open.chat()); // Gets a default message from the AI
 })
 
 // will recieve an image from the client
