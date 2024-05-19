@@ -58,20 +58,22 @@ function App() {
         });
         console.log("audioBlob:",audioBlob)
 
-
+        const uuid = document.cookie.split('=')[1];
+        console.log(uuid);
 
         const data = {
           image: image,
           audio: audio
         }
 
-        console.log(data);
+        // send the cookie and data to the server
         const options = {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(data),
+          credentials: 'include'
         };
 
         try {
@@ -84,6 +86,10 @@ function App() {
           speech.text = emotion;
     
           speechSynthesis.speak(speech);
+
+          // save cookie
+          document.cookie = `uuid=${json.uuid}; max-age=36000; path=/`;
+
         } catch (error) {
           console.error('Error sending audio data to server: ', error);
         }
