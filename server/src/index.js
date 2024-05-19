@@ -39,6 +39,19 @@ app.listen(PORT, () => {
 	  console.log(`http://localhost:${PORT}`);
 })
 
+
+// New endpoint to pass user content to chat method
+app.post('/chat', async (req, res) => {
+	const { content } = req.body; // Get content from request body
+	try {
+	  const response = await open.chat(content);
+	  res.json({ response });
+	} catch (error) {
+	  res.status(500).json({ error: error.message });
+	}
+});
+  
+
 setInterval(() => {
 	  captureAndAnalyze();
 }, 5000);
