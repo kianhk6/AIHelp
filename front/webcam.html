@@ -12,10 +12,12 @@
   <!-- place 2 buttons, one to record audio from mic -->
   <!-- and another to stop recording -->
 
-  <div id="audio">
+  <div>
     <button id="record">Record</button>
     <button id="stop">Stop</button>
   </div>
+
+  <div id="audio"></div>
 
   <script>
     const recordButton = document.getElementById('record');
@@ -59,8 +61,8 @@
 
     // when the stop button is clicked, capture the image and send audio and image to the server
     stopButton.addEventListener('click', async () => {
-      // make Audio into a mp3
-      const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+
       const image = capture();
       const data = { audio: audioBlob, image };
       const options = {
